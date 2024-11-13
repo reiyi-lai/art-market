@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Artwork - Art Print Marketplace</title>
+    <style>
+        :root {
+            --green: #4CAF50;
+            --grey: #ccc;
+            --red: #f8d7da;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            padding: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: black;
+            text-decoration: none;
+            margin-right: 1.5rem;
+            font-weight: 500;
+        }
+
+        .navbar a:hover {
+            color: var(--grey);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        /* Back button */
+        .back-button {
+            display: inline-block;
+            padding: 12px;
+            background-color: var(--green);
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+        /* Edit Artwork section */
+        .div-container {
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--grey);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--green);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .current-image {
+            margin: 20px 0;
+        }
+
+        .current-image img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: var(--red);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}">My Profile</a>
+        <a href="{{ url_for('artworks') }}">Browse Artworks</a>
+        <a href="{{ url_for('my_artworks') }}">My Artworks</a>
+        <a href="{{ url_for('logout') }}">Logout ({{ session.username }})</a>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <a href="{{ url_for('my_artworks') }}" class="back-button">← Back to My Artworks</a>
+        
+        <div class="div-container">
+            <h2>Edit Artwork</h2>
+            
+            <form action="{{ url_for('update_artwork', artwork_id=artwork.artwork_id) }}" method="POST">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" value="{{ artwork.title }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" name="description" value="{{ artwork.description }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price ($)</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0.01" value="{{ "%.2f"|format(artwork.price) }}" required>
+                </div>
+
+                <div class="current-image">
+                    <label>Current Image</label>
+                    <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}" 
+                         onerror="this.outerHTML='<div style=\'padding: 20px; background-color: var(--grey);\'>No Image Available</div>'">
+                </div>
+
+                <div class="form-group">
+                    <label for="image_url">Image URL</label>
+                    <input type="url" id="image_url" name="image_url" value="{{ artwork.image_url }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category_id">Category</label>
+                    <select id="category_id" name="category_id" required>
+                        {% for category in categories %}
+                        <option value="{{ category.category_id }}" {% if category.category_id == artwork.category_id %}selected{% endif %}>
+                            {{ category.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

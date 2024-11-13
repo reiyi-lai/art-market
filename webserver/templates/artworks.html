@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Art Print Marketplace - Browse Artworks</title>
+    <style>
+        :root {
+            --green: #4CAF50;
+            --grey: #ccc;
+            --red: #f8d7da;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            padding: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: black;
+            text-decoration: none;
+            margin-right: 1.5rem;
+            font-weight: 500;
+        }
+
+        .navbar a:hover {
+            color: var(--grey);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Filters */
+        .filters {
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--grey);
+        }
+
+        .filter-group {
+            margin-bottom: 8px;
+            margin-top: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--green);
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        /* Artwork grid */
+        .artwork-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .artwork-card {
+            border: 1px solid var(--grey);
+            padding: 10px;
+        }
+
+        .artwork-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .artwork-title {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .artwork-price {
+            color: var(--green);
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .artwork-artist {
+            font-style: italic;
+            margin: 5px 0;
+        }
+
+        .artwork-category {
+            background-color: var(--grey);
+            padding: 4px 8px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid var(--grey);
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            margin-bottom: 20px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .flash-message {
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: var(--red);
+        }
+
+        .flash-message.error {
+            background-color: var(--red);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 20px auto;
+            }
+
+            .artwork-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}">My Profile</a>
+        <a href="{{ url_for('artworks') }}">Browse Artworks</a>
+        <a href="{{ url_for('my_artworks') }}">My Artworks</a>
+        {% if session.user_id %}
+        <a href="{{ url_for('logout') }}">Logout ({{ session.username }})</a>
+        {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </nav>
+
+    <div class="container">
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="get" action="{{ url_for('artworks') }}" class="filters">
+            <div class="filter-group">
+                <label for="category">Category:</label>
+                <select name="category_id" id="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.category_id }}" {% if selected_category and
+                        selected_category|string==category.category_id|string %}selected{% endif %}>
+                        {{ category.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="sort">Sort by Price:</label>
+                <select name="sort" id="sort">
+                    <option value="price_low" {% if sort_by=='price_low' %}selected{% endif %}>Low to High</option>
+                    <option value="price_high" {% if sort_by=='price_high' %}selected{% endif %}>High to Low</option>
+                </select>
+            </div>
+
+            <button type="submit">Apply Filters</button>
+
+            <div class="filter-group">
+                <input type="text" name="search" placeholder="Search artworks..." value="{{ search_query }}">
+            </div>
+        </form>
+
+        {% if artworks %}
+        <div class="artwork-grid">
+            {% for artwork in artworks %}
+                <div class="artwork-card">
+                    <a href="{{ url_for('artwork_detail', artwork_id=artwork.artwork_id) }}" style="text-decoration: none; color: inherit;">
+                        <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}" class="artwork-image" 
+                            onerror="this.outerHTML='<div class=\'artwork-image\'></div>'">
+                        <div class="artwork-info">
+                            <div class="artwork-title">{{ artwork.title }}</div>
+                            <div class="artwork-price">${{ "%.2f"|format(artwork.price) }}</div>
+                            <div class="artwork-artist">by {{ artwork.artist_name }}</div>
+                            <div class="artwork-category">{{ artwork.category_name }}</div>
+                            <p>{{ artwork.description[:100] }}{% if artwork.description|length > 100 %}...{% endif %}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results">
+            <h2>No artworks found</h2>
+            <p>Try adjusting your filters or search terms</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
