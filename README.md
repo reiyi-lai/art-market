@@ -1,4 +1,4 @@
-![ArtMarket Screenshot](images/screenshot.png)
+<img src="images/screenshot.png" alt="ArtMarket Screenshot" width="50%"/>
 
 ## Requirements
 
