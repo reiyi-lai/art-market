@@ -1,3 +1,5 @@
+![ArtMarket Screenshot](images/screenshot.png)
+
 ## Requirements
 
 - Python 3.x
