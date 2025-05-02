@@ -1,6 +1,4 @@
-# COMS4111 Project 1 Part 3
-
-A Flask-based database web application.
+# ArtMarket
 
 ## Requirements
 
