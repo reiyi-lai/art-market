@@ -1,4 +1,6 @@
-<img src="images/screenshot.png" alt="ArtMarket Screenshot" width="50%"/>
+<p align="center">
+    <img src="images/screenshot.png" alt="ArtMarket Screenshot" width="50%"/>
+</p>
 
 ## Requirements
 
