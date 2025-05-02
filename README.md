@@ -1,5 +1,3 @@
-# ArtMarket
-
 ## Requirements
 
 - Python 3.x
@@ -15,15 +13,16 @@ brew install postgresql
 Install the required packages:
 
 ```bash
-# using pip or pip3
+# use pip or pip3
 pip install -r requirements.txt
 ```
 
 ## Running the App
 
-Start the Flask server (you can use `python` or `python3`):
+Start the Flask server:
 
 ```bash
+# use python or python3
 python server.py
 ```
 
